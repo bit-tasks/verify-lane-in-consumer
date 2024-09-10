@@ -1,5 +1,5 @@
 import * as core from '@actions/core';
-import run from './scripts/install-modified-components';
+import run from './scripts/install-components-from-lane';
 import { isValidPOSIXPath } from './utils/validate-posix-path';
 import type { PackageManager } from './types/package-manager';
 

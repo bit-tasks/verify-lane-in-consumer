@@ -27,7 +27,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(require("@actions/core"));
-const install_modified_components_1 = __importDefault(require("./scripts/install-modified-components"));
+const install_components_from_lane_1 = __importDefault(require("./scripts/install-components-from-lane"));
 const validate_posix_path_1 = require("./utils/validate-posix-path");
 try {
     const projectDir = core.getInput('project-dir') || process.env.PROJECT_DIR || './';
@@ -58,7 +58,7 @@ try {
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }
-    (0, install_modified_components_1.default)(runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);
