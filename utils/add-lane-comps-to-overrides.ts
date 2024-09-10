@@ -7,9 +7,8 @@ export const addLaneCompsToOverrides = (
   LaneDetails: LaneDetails,
   projectDir: string
 ) => {
-  const packageJson = JSON.parse(
-    fs.readFileSync(join(projectDir, 'package.json'), 'utf-8')
-  );
+  const packageJsonPath = join(projectDir, 'package.json');
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const depsFromLane = getDepsFromLane(LaneDetails);
 
   const packageJsonOverrides = packageJson.overrides || {};
@@ -19,5 +18,5 @@ export const addLaneCompsToOverrides = (
     ...depsFromLane,
   };
 
-  fs.writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+  fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 };
