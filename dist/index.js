@@ -32,6 +32,7 @@ const validate_posix_path_1 = require("./utils/validate-posix-path");
 try {
     const projectDir = core.getInput('project-dir') || process.env.PROJECT_DIR || './';
     const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
+    const packageManager = core.getInput('package-manager') || 'npm';
     const laneName = core.getInput('lane-name');
     const branchName = core.getInput('branch-name') || laneName;
     const skipPush = core.getInput('skip-push') === 'true' ? true : false;
@@ -53,7 +54,11 @@ try {
     if (!gitUserEmail) {
         throw new Error('Git user email token not found');
     }
-    (0, install_modified_components_1.default)(skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
+    const runnerTemp = process.env.RUNNER_TEMP;
+    if (!runnerTemp) {
+        throw new Error('Runner temp directory not found');
+    }
+    (0, install_modified_components_1.default)(runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);

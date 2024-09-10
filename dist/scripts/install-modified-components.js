@@ -34,29 +34,36 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const exec_1 = require("@actions/exec");
 const core = __importStar(require("@actions/core"));
-const generate_install_deps_1 = require("../utils/generate-install-deps");
-const WS_NAME = 'bit-ws';
-const WS_DIR = `./${WS_NAME}`;
-const run = (skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+const path_1 = require("path");
+const add_lane_comps_to_overrides_1 = require("../utils/add-lane-comps-to-overrides");
+const installCommand = {
+    npm: 'npm install',
+    yarn: 'yarn add',
+    pnpm: 'pnpm install',
+};
+const run = (runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const WS_NAME = 'bit-ws';
+    const WS_DIR = (0, path_1.join)(runnerTemp, WS_NAME);
     // create a temporary workspace
-    yield (0, exec_1.exec)('bit', ['init', WS_NAME]);
-    // retrieve the list of affected components i a lane
-    let affectedCompsJson = '';
-    let affectedCompsObj = {};
+    yield (0, exec_1.exec)('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+    // retrieve the list of components in a lane
+    let compsInLaneJson = '';
+    let compsInLaneObj = {};
     const laneShowOptions = {
         cwd: WS_DIR,
         listeners: {
             stdout: (data) => {
-                affectedCompsJson = data.toString();
-                affectedCompsObj = JSON.parse(affectedCompsJson);
+                compsInLaneJson = data.toString();
+                compsInLaneObj = JSON.parse(compsInLaneJson);
             },
         },
     };
-    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneName}"`, '--remote', '--json', ...args], laneShowOptions);
+    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneName}"`, '--remote', '--json'], laneShowOptions);
     // remove temporary workspace
     yield (0, exec_1.exec)('rm', ['-rf', WS_DIR]);
-    // install the pre-release versions of modified dependencies in the project
-    yield (0, exec_1.exec)((0, generate_install_deps_1.generateInstallCommand)(affectedCompsObj), [], { cwd: projectDir });
+    // add lane components as overrides in the project's package.json
+    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(compsInLaneObj, projectDir);
+    yield (0, exec_1.exec)(`${installCommand[packageManager]}`, [], { cwd: projectDir });
     // Git operations
     yield (0, exec_1.exec)(`git config --global user.name "${gitUserName}"`, [], {
         cwd: projectDir,
