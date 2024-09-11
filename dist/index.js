@@ -4123,7 +4123,9 @@ const path_1 = __nccwpck_require__(17);
 const get_deps_from_lane_1 = __nccwpck_require__(493);
 const addLaneCompsToOverrides = (laneDetails, projectDir) => {
     const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
+    console.log('\nReading package.json from:', packageJsonPath);
     const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
+    console.log('\nCurrent package.json:', packageJson);
     const depsFromLane = (0, get_deps_from_lane_1.getDepsFromLane)(laneDetails);
     console.log('\nList of dependencies from lane:', depsFromLane);
     const packageJsonOverrides = packageJson.overrides || {};
