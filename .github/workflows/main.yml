@@ -29,3 +29,4 @@ jobs:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
           package-manager: 'npm'
+          skip-push: 'true'

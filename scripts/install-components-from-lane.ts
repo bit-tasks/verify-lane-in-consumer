@@ -2,7 +2,7 @@ import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
 import { WS_NAME } from '../index';
-import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
+// import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 import { getDepsFromLane } from '../utils/get-deps-from-lane';
 import type { LaneDetails } from '../types/lane-details';
 import type { PackageManager } from '../types/package-manager';
@@ -14,10 +14,10 @@ const installCommand: Record<PackageManager, string> = {
 };
 
 const run = async (
+  testCommand: string,
   runnerTemp: string,
   packageManager: PackageManager,
   skipPush: boolean,
-  skipCI: boolean,
   laneId: string,
   branchName: string,
   gitUserName: string,
@@ -67,6 +67,11 @@ const run = async (
   //   cwd: projectDir,
   // });
 
+  // run the test command
+  await exec(testCommand, [], {
+    cwd: projectDir,
+  });
+
   // Git operations
   await exec(`git config --global user.name "${gitUserName}"`, [], {
     cwd: projectDir,
@@ -84,9 +89,7 @@ const run = async (
 
   try {
     await exec(
-      `git commit -m "Commiting the latest updates from lane: ${laneId} to the Git branch (automated)${
-        skipCI ? ` [skip-ci]` : ''
-      }"`,
+      `git commit -m "Committing the latest updates from lane: ${laneId} to the Git branch (automated)`,
       [],
       { cwd: projectDir }
     );

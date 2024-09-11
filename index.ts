@@ -6,6 +6,7 @@ import type { PackageManager } from './types/package-manager';
 export const WS_NAME = 'bit-ws';
 
 try {
+  const testCommand: string = core.getInput('test-command') || 'npm test';
   const projectDir: string = core.getInput('project-dir') || './';
   const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
   const packageManager =
@@ -14,7 +15,6 @@ try {
   const branchName: string = core.getInput('branch-name') || laneId;
   const skipPush: boolean =
     core.getInput('skip-push') === 'true' ? true : false;
-  const skipCI: boolean = core.getInput('skip-ci') === 'false' ? false : true;
 
   if (!isValidPOSIXPath(projectDir)) {
     throw new Error('Invalid project directory path');
@@ -44,10 +44,10 @@ try {
   }
 
   run(
+    testCommand,
     runnerTemp,
     packageManager,
     skipPush,
-    skipCI,
     laneId,
     branchName,
     gitUserName,
