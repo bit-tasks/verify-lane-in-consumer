@@ -27,6 +27,9 @@ inputs:
 runs:
   using: 'composite'
   steps:
+    - name: 'initialize a temporary bit workspace'
+      shell: bash
+      run: mkdir -p "${RUNNER_TEMP}/bit-ws"
     - name: 'run install components from lane'
       run: node ${{ github.action_path }}/dist/index.js
       shell: bash
