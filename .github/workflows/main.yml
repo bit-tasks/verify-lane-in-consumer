@@ -3,9 +3,9 @@ on:
   workflow_dispatch:
     inputs:
       lane-id:
-        description: "The ID of the lane to install from in the format: org.scope/lane"
+        description: 'The ID of the lane to install from in the format: org.scope/lane'
         required: true
-        default: ""
+        default: ''
 permissions:
   contents: write
 jobs:
@@ -22,15 +22,14 @@ jobs:
       - name: Initialize Bit
         uses: bit-tasks/init@v2
         with:
-          skip-install: "true"
+          skip-install: 'true'
       - name: Verify Lane In Consumer
         uses: bit-tasks/verify-lane-in-consumer@master
         with:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
           package-manager: 'npm'
-        env:
-          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-          GIT_USER_NAME: ${{ env.GIT_USER_NAME }}
-          GIT_USER_EMAIL: ${{ env.GIT_USER_EMAIL }}
-          BIT_CONFIG_ACCESS_TOKEN: ${{ env.BIT_CONFIG_ACCESS_TOKEN }}
+          github-token: ${{ env.GITHUB_TOKEN }}
+          github-user-name: ${{ env.GIT_USER_NAME }}
+          github-user-email: ${{ env.GIT_USER_EMAIL }}
+          bit-config-access-token: ${{ env.BIT_CONFIG_ACCESS_TOKEN }}

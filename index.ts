@@ -30,17 +30,19 @@ try {
     throw new Error('Specify a lane other than "main"!');
   }
 
-  const gitUserName = process.env.GIT_USER_NAME;
+  const gitUserName =
+    core.getInput('git-user-name') || process.env.GIT_USER_NAME;
   if (!gitUserName) {
     throw new Error('Git user name not found');
   }
 
-  const gitUserEmail = process.env.GIT_USER_EMAIL;
+  const gitUserEmail =
+    core.getInput('git-user-email') || process.env.GIT_USER_EMAIL;
   if (!gitUserEmail) {
     throw new Error('Git user email token not found');
   }
 
-  const runnerTemp = process.env.RUNNER_TEMP;
+  const runnerTemp = core.getInput('runner-temp') || process.env.RUNNER_TEMP;
   if (!runnerTemp) {
     throw new Error('Runner temp directory not found');
   }
