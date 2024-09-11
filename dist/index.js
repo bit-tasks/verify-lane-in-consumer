@@ -4059,14 +4059,15 @@ const installCommand = {
     pnpm: 'pnpm install',
 };
 const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
-    const WS_DIR = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
-    // // create a temporary workspace
+    const wsDir = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
+    const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
+    // create a temporary workspace
     yield (0, exec_1.exec)('bit', ['init', index_1.WS_NAME, ...args], { cwd: runnerTemp });
     // retrieve the list of components in a lane
     let compsInLaneJson = '';
     let compsInLaneObj = {};
     const laneShowOptions = {
-        cwd: WS_DIR,
+        cwd: wsDir,
         listeners: {
             stdout: (data) => {
                 compsInLaneJson = data.toString();
@@ -4074,13 +4075,17 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, g
             },
         },
     };
+    // get the lane details
     yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], laneShowOptions);
-    // remove temporary workspace
-    // await exec('rm', ['-rf', WS_DIR]);
-    // add lane components as overrides in the project's package.json
+    // extract component IDs  from the lane and transform to dependencies and overrides
     const [overrides, depsToInstall] = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
-    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(projectDir, overrides);
+    // install dependencies from the lane
     yield (0, exec_1.exec)(`${installCommand[packageManager]} ${depsToInstall}`, [], {
+        cwd: projectDir,
+    });
+    // add lane components to the package.json overrides and install again (direct deps have to be replaced with the lane versions first)
+    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(packageJsonPath, overrides);
+    yield (0, exec_1.exec)(`${installCommand[packageManager]}`, [], {
         cwd: projectDir,
     });
     // Git operations
@@ -4123,9 +4128,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.addLaneCompsToOverrides = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(147));
-const path_1 = __nccwpck_require__(17);
-const addLaneCompsToOverrides = (projectDir, overrides = {}) => {
-    const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
+const addLaneCompsToOverrides = (packageJsonPath, overrides = {}) => {
     const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
     const packageJsonOverrides = packageJson.overrides || {};
     packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), overrides);

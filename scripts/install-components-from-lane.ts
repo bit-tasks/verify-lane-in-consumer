@@ -25,9 +25,10 @@ const run = async (
   projectDir: string,
   args: string[]
 ) => {
-  const WS_DIR = join(runnerTemp, WS_NAME);
+  const wsDir = join(runnerTemp, WS_NAME);
+  const packageJsonPath = join(projectDir, 'package.json');
 
-  // // create a temporary workspace
+  // create a temporary workspace
   await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
 
   // retrieve the list of components in a lane
@@ -35,7 +36,7 @@ const run = async (
   let compsInLaneObj = {} as LaneDetails;
 
   const laneShowOptions = {
-    cwd: WS_DIR,
+    cwd: wsDir,
     listeners: {
       stdout: (data: Buffer) => {
         compsInLaneJson = data.toString();
@@ -44,22 +45,25 @@ const run = async (
     },
   };
 
+  // get the lane details
   await exec(
     'bit',
     ['lane', 'show', `"${laneId}"`, '--remote', '--json'],
     laneShowOptions
   );
 
-  // remove temporary workspace
-  // await exec('rm', ['-rf', WS_DIR]);
-
-  // add lane components as overrides in the project's package.json
-
+  // extract component IDs  from the lane and transform to dependencies and overrides
   const [overrides, depsToInstall] = getDepsFromLane(compsInLaneObj);
 
-  addLaneCompsToOverrides(projectDir, overrides);
-
+  // install dependencies from the lane
   await exec(`${installCommand[packageManager]} ${depsToInstall}`, [], {
+    cwd: projectDir,
+  });
+
+  // add lane components to the package.json overrides and install again (direct deps have to be replaced with the lane versions first)
+  addLaneCompsToOverrides(packageJsonPath, overrides);
+
+  await exec(`${installCommand[packageManager]}`, [], {
     cwd: projectDir,
   });
 

@@ -2,10 +2,9 @@ import fs from 'fs';
 import { join } from 'path';
 
 export const addLaneCompsToOverrides = (
-  projectDir: string,
+  packageJsonPath: string,
   overrides: Record<string, string> = {}
 ) => {
-  const packageJsonPath = join(projectDir, 'package.json');
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const packageJsonOverrides = packageJson.overrides || {};
   packageJson.overrides = {
