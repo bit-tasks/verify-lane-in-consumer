@@ -24,7 +24,7 @@ jobs:
         with:
           skip-install: 'true'
       - name: Verify Lane In Consumer
-        uses: bit-tasks/verify-lane-in-consumer@master
+        uses: bit-tasks/verify-lane-in-consumer@main
         with:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
