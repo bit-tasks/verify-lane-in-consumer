@@ -28,6 +28,15 @@ inputs:
   skip-ci:
     description: 'Remove adding [skip-ci] to the .bitmap file commit message'
     required: false
+  github-token:
+    required: true
+  git-user-name:
+    required: true
+  git-user-email:
+    required: true
+  bit-config-access-token:
+    required: true
+
 runs:
   using: 'composite'
   steps:
