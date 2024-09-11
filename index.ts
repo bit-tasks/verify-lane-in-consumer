@@ -9,7 +9,9 @@ try {
     core.getInput('project-dir') || process.env.PROJECT_DIR || './';
   const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
   const packageManager =
-    (core.getInput('package-manager') as PackageManager) || 'npm';
+    (core.getInput('package-manager') as PackageManager) ||
+    process.env.PACKAGE_MANAGER ||
+    'npm';
   const laneName: string = core.getInput('lane-name');
   const branchName: string = core.getInput('branch-name') || laneName;
   const skipPush: boolean =

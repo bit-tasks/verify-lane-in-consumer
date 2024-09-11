@@ -32,3 +32,9 @@ runs:
       shell: bash
       env:
         RUNNER_TEMP: ${{ runner.temp }}
+        WSDIR: ${{ inputs.ws-dir }}
+        CACHE: ${{ inputs.cache }}
+        RIPPLE: ${{ inputs.ripple }}
+        LOG: ${{ inputs.log }}
+        SKIP_INSTALL: ${{ inputs.skip-install }}
+        PACKAGE_MANAGER: ${{ inputs.package-manager }}

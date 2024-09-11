@@ -3973,7 +3973,9 @@ try {
     const wsDir = core.getInput('ws-dir') || process.env.WSDIR || './';
     const projectDir = core.getInput('project-dir') || process.env.PROJECT_DIR || './';
     const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
-    const packageManager = core.getInput('package-manager') || 'npm';
+    const packageManager = core.getInput('package-manager') ||
+        process.env.PACKAGE_MANAGER ||
+        'npm';
     const laneName = core.getInput('lane-name');
     const branchName = core.getInput('branch-name') || laneName;
     const skipPush = core.getInput('skip-push') === 'true' ? true : false;
