@@ -17,7 +17,7 @@ export const getDepsFromLane = (
     listOfDepsToInstall.push(
       `${packageScope}.${packageNameNoScope}@${componentVersion}`
     );
-    overrides[`${packageScope}.${packageNameNoScope}`] = componentVersion;
+    overrides[`${packageScope}.${packageNameNoScope}`] = `^${componentVersion}`;
   });
   return [overrides, listOfDepsToInstall.join(' ')];
 };

@@ -4156,7 +4156,7 @@ const getDepsFromLane = (laneDetails) => {
         const packageScope = '@'.concat(scope.replace(/\./g, '/'));
         const packageNameNoScope = componentIdParts.join('.');
         listOfDepsToInstall.push(`${packageScope}.${packageNameNoScope}@${componentVersion}`);
-        overrides[`${packageScope}.${packageNameNoScope}`] = componentVersion;
+        overrides[`${packageScope}.${packageNameNoScope}`] = `^${componentVersion}`;
     });
     return [overrides, listOfDepsToInstall.join(' ')];
 };
