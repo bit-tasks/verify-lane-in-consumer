@@ -1,4 +1,4 @@
-name: Test Verify Lane In Consumer
+name: Verify Lane In Consumer
 on:
   workflow_dispatch:
     inputs:
@@ -28,5 +28,4 @@ jobs:
         with:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
-          package-manager: 'npm'
           skip-push: 'true'
