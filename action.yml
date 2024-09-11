@@ -8,8 +8,8 @@ inputs:
     description: 'The package manager to use for dependency installation'
     required: false
     default: 'npm'
-  project-dir:
-    description: 'The path to the project'
+  ws-dir:
+    description: 'The path to the workspace'
     required: false
     default: './'
   lane-name:

@@ -34,23 +34,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const exec_1 = require("@actions/exec");
 const core = __importStar(require("@actions/core"));
-const path_1 = require("path");
 const add_lane_comps_to_overrides_1 = require("../utils/add-lane-comps-to-overrides");
 const installCommand = {
     npm: 'npm install',
     yarn: 'yarn add',
     pnpm: 'pnpm install',
 };
-const run = (runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
-    const WS_NAME = 'bit-ws';
-    const WS_DIR = (0, path_1.join)(runnerTemp, WS_NAME);
-    // create a temporary workspace
-    yield (0, exec_1.exec)('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+const run = (wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+    // const WS_NAME = 'bit-ws';
+    // const WS_DIR = join(runnerTemp, WS_NAME);
+    // // create a temporary workspace
+    // await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
     // retrieve the list of components in a lane
     let compsInLaneJson = '';
     let compsInLaneObj = {};
     const laneShowOptions = {
-        cwd: WS_DIR,
+        cwd: wsDir,
         listeners: {
             stdout: (data) => {
                 compsInLaneJson = data.toString();
@@ -60,7 +59,7 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneName, branchName,
     };
     yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneName}"`, '--remote', '--json'], laneShowOptions);
     // remove temporary workspace
-    yield (0, exec_1.exec)('rm', ['-rf', WS_DIR]);
+    // await exec('rm', ['-rf', WS_DIR]);
     // add lane components as overrides in the project's package.json
     (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(compsInLaneObj, projectDir);
     yield (0, exec_1.exec)(`${installCommand[packageManager]}`, [], { cwd: projectDir });

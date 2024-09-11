@@ -4,6 +4,7 @@ import { isValidPOSIXPath } from './utils/validate-posix-path';
 import type { PackageManager } from './types/package-manager';
 
 try {
+  const wsDir: string = core.getInput('ws-dir') || process.env.WSDIR || './';
   const projectDir: string =
     core.getInput('project-dir') || process.env.PROJECT_DIR || './';
   const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
@@ -43,7 +44,7 @@ try {
   }
 
   run(
-    runnerTemp,
+    wsDir,
     packageManager,
     skipPush,
     skipCI,

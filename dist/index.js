@@ -30,6 +30,7 @@ const core = __importStar(require("@actions/core"));
 const install_components_from_lane_1 = __importDefault(require("./scripts/install-components-from-lane"));
 const validate_posix_path_1 = require("./utils/validate-posix-path");
 try {
+    const wsDir = core.getInput('ws-dir') || process.env.WSDIR || './';
     const projectDir = core.getInput('project-dir') || process.env.PROJECT_DIR || './';
     const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
     const packageManager = core.getInput('package-manager') || 'npm';
@@ -58,7 +59,7 @@ try {
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }
-    (0, install_components_from_lane_1.default)(runnerTemp, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);

@@ -12,7 +12,7 @@ const installCommand: Record<PackageManager, string> = {
 };
 
 const run = async (
-  runnerTemp: string,
+  wsDir: string,
   packageManager: PackageManager,
   skipPush: boolean,
   skipCI: boolean,
@@ -23,18 +23,18 @@ const run = async (
   projectDir: string,
   args: string[]
 ) => {
-  const WS_NAME = 'bit-ws';
-  const WS_DIR = join(runnerTemp, WS_NAME);
+  // const WS_NAME = 'bit-ws';
+  // const WS_DIR = join(runnerTemp, WS_NAME);
 
-  // create a temporary workspace
-  await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+  // // create a temporary workspace
+  // await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
 
   // retrieve the list of components in a lane
   let compsInLaneJson = '';
   let compsInLaneObj = {} as LaneDetails;
 
   const laneShowOptions = {
-    cwd: WS_DIR,
+    cwd: wsDir,
     listeners: {
       stdout: (data: Buffer) => {
         compsInLaneJson = data.toString();
@@ -50,7 +50,7 @@ const run = async (
   );
 
   // remove temporary workspace
-  await exec('rm', ['-rf', WS_DIR]);
+  // await exec('rm', ['-rf', WS_DIR]);
 
   // add lane components as overrides in the project's package.json
 
