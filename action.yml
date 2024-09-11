@@ -25,7 +25,9 @@ inputs:
     description: 'Remove adding [skip-ci] to the .bitmap file commit message'
     required: false
 runs:
-  using: 'node20'
-  main: 'dist/index.js'
-  env:
-    RUNNER_TEMP: ${{ runner.temp }}
+  using: 'composite'
+  steps:
+    - name: 'run install components from lane'
+      run: 'dist/index.js'
+      env:
+        RUNNER_TEMP: ${{ runner.temp }}
