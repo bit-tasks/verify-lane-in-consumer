@@ -1,6 +1,7 @@
 import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
+import { WS_NAME } from '../index';
 import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 import type { LaneDetails } from '../types/lane-details';
 import type { PackageManager } from '../types/package-manager';
@@ -12,7 +13,7 @@ const installCommand: Record<PackageManager, string> = {
 };
 
 const run = async (
-  wsDir: string,
+  runnerTemp: string,
   packageManager: PackageManager,
   skipPush: boolean,
   skipCI: boolean,
@@ -23,18 +24,17 @@ const run = async (
   projectDir: string,
   args: string[]
 ) => {
-  // const WS_NAME = 'bit-ws';
-  // const WS_DIR = join(runnerTemp, WS_NAME);
+  const WS_DIR = join(runnerTemp, WS_NAME);
 
   // // create a temporary workspace
-  // await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+  await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
 
   // retrieve the list of components in a lane
   let compsInLaneJson = '';
   let compsInLaneObj = {} as LaneDetails;
 
   const laneShowOptions = {
-    cwd: wsDir,
+    cwd: WS_DIR,
     listeners: {
       stdout: (data: Buffer) => {
         compsInLaneJson = data.toString();

@@ -3,10 +3,10 @@ import run from './scripts/install-components-from-lane';
 import { isValidPOSIXPath } from './utils/validate-posix-path';
 import type { PackageManager } from './types/package-manager';
 
+export const WS_NAME = 'bit-ws';
+
 try {
-  const wsDir: string = core.getInput('ws-dir') || process.env.WSDIR || './';
-  const projectDir: string =
-    core.getInput('project-dir') || './';
+  const projectDir: string = core.getInput('project-dir') || './';
   const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
   const packageManager =
     (core.getInput('package-manager') as PackageManager) || 'npm';
@@ -44,7 +44,7 @@ try {
   }
 
   run(
-    wsDir,
+    runnerTemp,
     packageManager,
     skipPush,
     skipCI,

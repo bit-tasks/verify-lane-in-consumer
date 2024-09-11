@@ -3966,11 +3966,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WS_NAME = void 0;
 const core = __importStar(__nccwpck_require__(186));
 const install_components_from_lane_1 = __importDefault(__nccwpck_require__(154));
 const validate_posix_path_1 = __nccwpck_require__(533);
+exports.WS_NAME = 'bit-ws';
 try {
-    const wsDir = core.getInput('ws-dir') || process.env.WSDIR || './';
     const projectDir = core.getInput('project-dir') || './';
     const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
     const packageManager = core.getInput('package-manager') || 'npm';
@@ -3999,7 +4000,7 @@ try {
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }
-    (0, install_components_from_lane_1.default)(wsDir, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);
@@ -4048,22 +4049,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const exec_1 = __nccwpck_require__(514);
 const core = __importStar(__nccwpck_require__(186));
+const path_1 = __nccwpck_require__(17);
+const index_1 = __nccwpck_require__(177);
 const add_lane_comps_to_overrides_1 = __nccwpck_require__(651);
 const installCommand = {
     npm: 'npm install',
     yarn: 'yarn add',
     pnpm: 'pnpm install',
 };
-const run = (wsDir, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
-    // const WS_NAME = 'bit-ws';
-    // const WS_DIR = join(runnerTemp, WS_NAME);
+const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+    const WS_DIR = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
     // // create a temporary workspace
-    // await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+    yield (0, exec_1.exec)('bit', ['init', index_1.WS_NAME, ...args], { cwd: runnerTemp });
     // retrieve the list of components in a lane
     let compsInLaneJson = '';
     let compsInLaneObj = {};
     const laneShowOptions = {
-        cwd: wsDir,
+        cwd: WS_DIR,
         listeners: {
             stdout: (data) => {
                 compsInLaneJson = data.toString();
