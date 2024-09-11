@@ -1,6 +1,4 @@
-import { relative } from "path"
-
-# Verify Changes in Bit Lane in a Consumer Repository
+# Verify Changes in a Bit Lane in a Consumer Project
 
 This task verifies the changes on a Bit lane are compatible with the consumer project.
 
