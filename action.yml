@@ -4,6 +4,10 @@ branding:
   icon: 'git-merge'
   color: 'purple'
 inputs:
+  package-manager:
+    description: 'The package manager to use for dependency installation'
+    required: false
+    default: 'npm'
   project-dir:
     description: 'The path to the consumer project'
     required: false
