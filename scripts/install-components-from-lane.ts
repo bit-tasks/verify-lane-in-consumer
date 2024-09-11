@@ -3,6 +3,7 @@ import * as core from '@actions/core';
 import { join } from 'path';
 import { WS_NAME } from '../index';
 import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
+import { getDepsFromLane } from '../utils/get-deps-from-lane';
 import type { LaneDetails } from '../types/lane-details';
 import type { PackageManager } from '../types/package-manager';
 
@@ -54,9 +55,13 @@ const run = async (
 
   // add lane components as overrides in the project's package.json
 
-  addLaneCompsToOverrides(compsInLaneObj, projectDir);
+  const [overrides, depsToInstall] = getDepsFromLane(compsInLaneObj);
 
-  await exec(`${installCommand[packageManager]}`, [], { cwd: projectDir });
+  addLaneCompsToOverrides(projectDir, overrides);
+
+  await exec(`${installCommand[packageManager]} ${depsToInstall}`, [], {
+    cwd: projectDir,
+  });
 
   // Git operations
   await exec(`git config --global user.name "${gitUserName}"`, [], {

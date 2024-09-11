@@ -1,32 +1,29 @@
+import { relative } from "path"
+
 # Verify Changes in Bit Lane in a Consumer Repository
 
-When a lane is created or modified in **bit.cloud** sync the changes with the respective Git branch.
+This task verifies the changes on a Bit lane are compatible with the consumer project.
 
-# GitHub Actions
+A Bit lane containes a set of components that are updated together.
+This task installs the pre-release version of the components in the lane and runs the tests (or deploys to stage) in the consumer project to verify the changes.
 
-This task synchronize updates to a Bit lane with its respective Git Branch. As the next step in your pipeline.
+The auto-generated branch is only for testing purposes and should not be merged to the main branch.
 
-## Inputs
+### `lane-id`
 
-### `ws-dir`
+**Required** The Bit lane ID to install the pre-release version of the components.
 
-**Optional** The workspace directory path from the root. Default `"Dir specified in Init Task or ./"`.
+### `project-dir`
 
-### `lane-name`
+The relative path to the project directory. Default is `.`.
 
-**Required** The source Bit lane name where the component updates are sync from. The lane name should follow the format `org.scope/lane-name`.
+### `package-manager`
 
-### `branch-name`
+The package manager to install the components. Default is `npm`.
 
-**Optional** The destination Git branch name where the component updates are sync to. Default `lane-name`.
+### `test-command`
 
-### `skip-push`
-
-**Optional** Skip push for testing purposes.
-
-### `skip-ci`
-
-**Optional** The Git commit message includes `[skip-ci]` to disable subsequent CI triggers as a result of the file modifications. Use `skip-ci: 'false'` to remove it.
+The command to run the tests. Default is `npm test`.
 
 ## Example usage
 

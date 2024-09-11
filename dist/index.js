@@ -4052,6 +4052,7 @@ const core = __importStar(__nccwpck_require__(186));
 const path_1 = __nccwpck_require__(17);
 const index_1 = __nccwpck_require__(177);
 const add_lane_comps_to_overrides_1 = __nccwpck_require__(651);
+const get_deps_from_lane_1 = __nccwpck_require__(493);
 const installCommand = {
     npm: 'npm install',
     yarn: 'yarn add',
@@ -4077,8 +4078,11 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, g
     // remove temporary workspace
     // await exec('rm', ['-rf', WS_DIR]);
     // add lane components as overrides in the project's package.json
-    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(compsInLaneObj, projectDir);
-    yield (0, exec_1.exec)(`${installCommand[packageManager]}`, [], { cwd: projectDir });
+    const [overrides, depsToInstall] = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
+    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(projectDir, overrides);
+    yield (0, exec_1.exec)(`${installCommand[packageManager]} ${depsToInstall}`, [], {
+        cwd: projectDir,
+    });
     // Git operations
     yield (0, exec_1.exec)(`git config --global user.name "${gitUserName}"`, [], {
         cwd: projectDir,
@@ -4120,17 +4124,11 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.addLaneCompsToOverrides = void 0;
 const fs_1 = __importDefault(__nccwpck_require__(147));
 const path_1 = __nccwpck_require__(17);
-const get_deps_from_lane_1 = __nccwpck_require__(493);
-const addLaneCompsToOverrides = (laneDetails, projectDir) => {
+const addLaneCompsToOverrides = (projectDir, overrides = {}) => {
     const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
-    console.log('\nReading package.json from:', packageJsonPath);
     const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
-    console.log('\nCurrent package.json:', packageJson);
-    const depsFromLane = (0, get_deps_from_lane_1.getDepsFromLane)(laneDetails);
-    console.log('\nList of dependencies from lane:', depsFromLane);
     const packageJsonOverrides = packageJson.overrides || {};
-    packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), depsFromLane);
-    console.log('\nUpdated package.json:', packageJson);
+    packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), overrides);
     fs_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 };
 exports.addLaneCompsToOverrides = addLaneCompsToOverrides;
@@ -4146,17 +4144,18 @@ exports.addLaneCompsToOverrides = addLaneCompsToOverrides;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getDepsFromLane = void 0;
 const getDepsFromLane = (laneDetails) => {
-    const dependenciesFromLane = {};
+    const overrides = {};
+    const listOfDepsToInstall = [];
     laneDetails.components.forEach((component) => {
         const [componentIdNoVersion, componentVersion] = component.id.split('@');
         const componentIdParts = componentIdNoVersion.split('/');
         const scope = componentIdParts.shift().replace(/\./g, '/');
         const packageScope = '@'.concat(scope.replace(/\./g, '/'));
         const packageNameNoScope = componentIdParts.join('.');
-        dependenciesFromLane[`${packageScope}.${packageNameNoScope}`] =
-            componentVersion;
+        listOfDepsToInstall.push(`${packageScope}.${packageNameNoScope}@${componentVersion}`);
+        overrides[`${packageScope}.${packageNameNoScope}`] = componentVersion;
     });
-    return dependenciesFromLane;
+    return [overrides, listOfDepsToInstall.join(' ')];
 };
 exports.getDepsFromLane = getDepsFromLane;
 
