@@ -49,8 +49,6 @@ const run = async (
     laneShowOptions
   );
 
-  console.log('List of components in lane:', compsInLaneObj);
-
   // remove temporary workspace
   // await exec('rm', ['-rf', WS_DIR]);
 
