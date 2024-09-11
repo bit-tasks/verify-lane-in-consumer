@@ -61,11 +61,11 @@ const run = async (
   });
 
   // add lane components to the package.json overrides and install again (direct deps have to be replaced with the lane versions first)
-  addLaneCompsToOverrides(packageJsonPath, overrides);
+  // addLaneCompsToOverrides(packageJsonPath, overrides);
 
-  await exec(`${installCommand[packageManager]}`, [], {
-    cwd: projectDir,
-  });
+  // await exec(`${installCommand[packageManager]}`, [], {
+  //   cwd: projectDir,
+  // });
 
   // Git operations
   await exec(`git config --global user.name "${gitUserName}"`, [], {

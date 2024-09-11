@@ -4051,7 +4051,6 @@ const exec_1 = __nccwpck_require__(514);
 const core = __importStar(__nccwpck_require__(186));
 const path_1 = __nccwpck_require__(17);
 const index_1 = __nccwpck_require__(177);
-const add_lane_comps_to_overrides_1 = __nccwpck_require__(651);
 const get_deps_from_lane_1 = __nccwpck_require__(493);
 const installCommand = {
     npm: 'npm install',
@@ -4084,10 +4083,10 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, g
         cwd: projectDir,
     });
     // add lane components to the package.json overrides and install again (direct deps have to be replaced with the lane versions first)
-    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(packageJsonPath, overrides);
-    yield (0, exec_1.exec)(`${installCommand[packageManager]}`, [], {
-        cwd: projectDir,
-    });
+    // addLaneCompsToOverrides(packageJsonPath, overrides);
+    // await exec(`${installCommand[packageManager]}`, [], {
+    //   cwd: projectDir,
+    // });
     // Git operations
     yield (0, exec_1.exec)(`git config --global user.name "${gitUserName}"`, [], {
         cwd: projectDir,
@@ -4113,28 +4112,6 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, g
     }
 });
 exports["default"] = run;
-
-
-/***/ }),
-
-/***/ 651:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.addLaneCompsToOverrides = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(147));
-const addLaneCompsToOverrides = (packageJsonPath, overrides = {}) => {
-    const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
-    const packageJsonOverrides = packageJson.overrides || {};
-    packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), overrides);
-    fs_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-};
-exports.addLaneCompsToOverrides = addLaneCompsToOverrides;
 
 
 /***/ }),
