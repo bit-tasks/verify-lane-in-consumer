@@ -27,12 +27,7 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - name: 'initialize a temporary bit workspace'
-      shell: bash
-      run: node ${{ github.action_path }}/dist/init-ws.js
-       env:
-        RUNNER_TEMP: ${{ runner.temp }}
-    - name: 'run install components from lane'
+    - name: 'install components from lane'
       run: node ${{ github.action_path }}/dist/index.js
       shell: bash
       env:
