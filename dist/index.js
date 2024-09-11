@@ -3971,12 +3971,10 @@ const install_components_from_lane_1 = __importDefault(__nccwpck_require__(154))
 const validate_posix_path_1 = __nccwpck_require__(533);
 try {
     const wsDir = core.getInput('ws-dir') || process.env.WSDIR || './';
-    const projectDir = core.getInput('project-dir') || process.env.PROJECT_DIR || './';
+    const projectDir = core.getInput('project-dir') || './';
     const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
-    const packageManager = core.getInput('package-manager') ||
-        process.env.PACKAGE_MANAGER ||
-        'npm';
-    const laneId = core.getInput('lane-id') || process.env.LANE_ID || '';
+    const packageManager = core.getInput('package-manager') || 'npm';
+    const laneId = core.getInput('lane-id') || '';
     const branchName = core.getInput('branch-name') || laneId;
     const skipPush = core.getInput('skip-push') === 'true' ? true : false;
     const skipCI = core.getInput('skip-ci') === 'false' ? false : true;
@@ -3989,15 +3987,15 @@ try {
     if (laneId === 'main') {
         throw new Error('Specify a lane other than "main"!');
     }
-    const gitUserName = core.getInput('git-user-name') || process.env.GIT_USER_NAME;
+    const gitUserName = process.env.GIT_USER_NAME;
     if (!gitUserName) {
         throw new Error('Git user name not found');
     }
-    const gitUserEmail = core.getInput('git-user-email') || process.env.GIT_USER_EMAIL;
+    const gitUserEmail = process.env.GIT_USER_EMAIL;
     if (!gitUserEmail) {
         throw new Error('Git user email token not found');
     }
-    const runnerTemp = core.getInput('runner-temp') || process.env.RUNNER_TEMP;
+    const runnerTemp = process.env.RUNNER_TEMP;
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }

@@ -6,13 +6,11 @@ import type { PackageManager } from './types/package-manager';
 try {
   const wsDir: string = core.getInput('ws-dir') || process.env.WSDIR || './';
   const projectDir: string =
-    core.getInput('project-dir') || process.env.PROJECT_DIR || './';
+    core.getInput('project-dir') || './';
   const args = process.env.LOG ? [`--log=${process.env.LOG}`] : [];
   const packageManager =
-    (core.getInput('package-manager') as PackageManager) ||
-    process.env.PACKAGE_MANAGER ||
-    'npm';
-  const laneId: string = core.getInput('lane-id') || process.env.LANE_ID || '';
+    (core.getInput('package-manager') as PackageManager) || 'npm';
+  const laneId: string = core.getInput('lane-id') || '';
   const branchName: string = core.getInput('branch-name') || laneId;
   const skipPush: boolean =
     core.getInput('skip-push') === 'true' ? true : false;
@@ -30,19 +28,17 @@ try {
     throw new Error('Specify a lane other than "main"!');
   }
 
-  const gitUserName =
-    core.getInput('git-user-name') || process.env.GIT_USER_NAME;
+  const gitUserName = process.env.GIT_USER_NAME;
   if (!gitUserName) {
     throw new Error('Git user name not found');
   }
 
-  const gitUserEmail =
-    core.getInput('git-user-email') || process.env.GIT_USER_EMAIL;
+  const gitUserEmail = process.env.GIT_USER_EMAIL;
   if (!gitUserEmail) {
     throw new Error('Git user email token not found');
   }
 
-  const runnerTemp = core.getInput('runner-temp') || process.env.RUNNER_TEMP;
+  const runnerTemp = process.env.RUNNER_TEMP;
   if (!runnerTemp) {
     throw new Error('Runner temp directory not found');
   }

@@ -29,7 +29,3 @@ jobs:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
           package-manager: 'npm'
-          github-token: ${{ env.GITHUB_TOKEN }}
-          github-user-name: ${{ env.GIT_USER_NAME }}
-          github-user-email: ${{ env.GIT_USER_EMAIL }}
-          bit-config-access-token: ${{ env.BIT_CONFIG_ACCESS_TOKEN }}
