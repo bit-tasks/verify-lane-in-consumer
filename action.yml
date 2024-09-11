@@ -43,3 +43,7 @@ runs:
         SKIP_INSTALL: ${{ inputs.skip-install }}
         PACKAGE_MANAGER: ${{ inputs.package-manager }}
         LANE_ID: ${{ inputs.lane-id }}
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        GIT_USER_NAME: ${{ env.GIT_USER_NAME }}
+        GIT_USER_EMAIL: ${{ env.GIT_USER_EMAIL }}
+        BIT_CONFIG_ACCESS_TOKEN: ${{ env.BIT_CONFIG_ACCESS_TOKEN }}
