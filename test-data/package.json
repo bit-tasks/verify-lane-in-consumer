@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@learnbit-react/design.input.button": "^0.0.4",
-    "@learnbit-react/design.typography.heading": "^0.0.1",
+    "@learnbit-react/design.input.button": "^0.0.0-34b124c8491115daae9d6accb28b41d01e051e54",
+    "@learnbit-react/design.typography.heading": "^0.0.0-88b87e1fef19fa5e67aaf783808507d4cfb3f9ac",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "react": "^18.3.1",
