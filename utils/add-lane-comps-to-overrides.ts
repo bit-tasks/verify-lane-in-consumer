@@ -11,6 +11,8 @@ export const addLaneCompsToOverrides = (
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
   const depsFromLane = getDepsFromLane(laneDetails);
 
+  console.log('List of dependencies from lane:', depsFromLane);
+
   const packageJsonOverrides = packageJson.overrides || {};
 
   packageJson.overrides = {
