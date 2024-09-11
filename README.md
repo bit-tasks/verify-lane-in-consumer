@@ -25,6 +25,37 @@ The command to run the tests. Default is `npm test`.
 
 ## Example usage
 
+```yml
+name: Verify Lane In Consumer
+on:
+  workflow_dispatch:
+    inputs:
+      lane-id:
+        description: 'The ID of the lane to install from in the format: org.scope/lane'
+        required: true
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GIT_USER_NAME: ${{ secrets.GIT_USER_NAME }}
+      GIT_USER_EMAIL: ${{ secrets.GIT_USER_EMAIL }}
+      BIT_CONFIG_ACCESS_TOKEN: ${{ secrets.BIT_CONFIG_ACCESS_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Initialize Bit
+        uses: bit-tasks/init@v2
+        with:
+          skip-install: 'true'
+      - name: Verify Lane In Consumer
+        uses: bit-tasks/verify-lane-in-consumer@main
+        with:
+          lane-id: ${{ github.event.inputs.lane-id }}
+```
+
 # Contributor Guide
 
 Steps to create custom tasks in different CI/CD platforms.
