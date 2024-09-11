@@ -3976,17 +3976,17 @@ try {
     const packageManager = core.getInput('package-manager') ||
         process.env.PACKAGE_MANAGER ||
         'npm';
-    const laneName = core.getInput('lane-name');
-    const branchName = core.getInput('branch-name') || laneName;
+    const laneId = core.getInput('lane-id') || process.env.LANE_ID || '';
+    const branchName = core.getInput('branch-name') || laneId;
     const skipPush = core.getInput('skip-push') === 'true' ? true : false;
     const skipCI = core.getInput('skip-ci') === 'false' ? false : true;
     if (!(0, validate_posix_path_1.isValidPOSIXPath)(projectDir)) {
         throw new Error('Invalid project directory path');
     }
-    if (!laneName) {
-        throw new Error('Lane name is not found');
+    if (!laneId) {
+        throw new Error('Lane ID is not found');
     }
-    if (laneName === 'main') {
+    if (laneId === 'main') {
         throw new Error('Specify a lane other than "main"!');
     }
     const gitUserName = process.env.GIT_USER_NAME;
@@ -4001,7 +4001,7 @@ try {
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }
-    (0, install_components_from_lane_1.default)(wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(wsDir, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);
@@ -4056,7 +4056,7 @@ const installCommand = {
     yarn: 'yarn add',
     pnpm: 'pnpm install',
 };
-const run = (wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+const run = (wsDir, packageManager, skipPush, skipCI, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
     // const WS_NAME = 'bit-ws';
     // const WS_DIR = join(runnerTemp, WS_NAME);
     // // create a temporary workspace
@@ -4073,7 +4073,7 @@ const run = (wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitU
             },
         },
     };
-    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneName}"`, '--remote', '--json'], laneShowOptions);
+    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], laneShowOptions);
     // remove temporary workspace
     // await exec('rm', ['-rf', WS_DIR]);
     // add lane components as overrides in the project's package.json
@@ -4091,7 +4091,7 @@ const run = (wsDir, packageManager, skipPush, skipCI, laneName, branchName, gitU
     });
     yield (0, exec_1.exec)('git add .', [], { cwd: projectDir });
     try {
-        yield (0, exec_1.exec)(`git commit -m "Commiting the latest updates from lane: ${laneName} to the Git branch (automated)${skipCI ? ` [skip-ci]` : ''}"`, [], { cwd: projectDir });
+        yield (0, exec_1.exec)(`git commit -m "Commiting the latest updates from lane: ${laneId} to the Git branch (automated)${skipCI ? ` [skip-ci]` : ''}"`, [], { cwd: projectDir });
     }
     catch (error) {
         core.error(`Error while committing changes!`);

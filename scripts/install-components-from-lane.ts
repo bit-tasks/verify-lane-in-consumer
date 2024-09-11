@@ -16,7 +16,7 @@ const run = async (
   packageManager: PackageManager,
   skipPush: boolean,
   skipCI: boolean,
-  laneName: string,
+  laneId: string,
   branchName: string,
   gitUserName: string,
   gitUserEmail: string,
@@ -45,7 +45,7 @@ const run = async (
 
   await exec(
     'bit',
-    ['lane', 'show', `"${laneName}"`, '--remote', '--json'],
+    ['lane', 'show', `"${laneId}"`, '--remote', '--json'],
     laneShowOptions
   );
 
@@ -75,7 +75,7 @@ const run = async (
 
   try {
     await exec(
-      `git commit -m "Commiting the latest updates from lane: ${laneName} to the Git branch (automated)${
+      `git commit -m "Commiting the latest updates from lane: ${laneId} to the Git branch (automated)${
         skipCI ? ` [skip-ci]` : ''
       }"`,
       [],

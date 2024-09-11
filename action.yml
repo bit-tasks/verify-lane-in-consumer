@@ -12,8 +12,8 @@ inputs:
     description: 'The path to the workspace'
     required: false
     default: './'
-  lane-name:
-    description: 'The name of the Bit lane to sync from in the format: org.scope/lane'
+  lane-id:
+    description: 'The ID of the Bit lane to sync from in the format: org.scope/lane'
     required: true
   branch-name:
     description: 'The destination Git branch name where the updates are sync to'
@@ -38,3 +38,4 @@ runs:
         LOG: ${{ inputs.log }}
         SKIP_INSTALL: ${{ inputs.skip-install }}
         PACKAGE_MANAGER: ${{ inputs.package-manager }}
+        LANE_ID: ${{ inputs.lane-id }}

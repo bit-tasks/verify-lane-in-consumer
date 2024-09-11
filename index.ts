@@ -12,8 +12,8 @@ try {
     (core.getInput('package-manager') as PackageManager) ||
     process.env.PACKAGE_MANAGER ||
     'npm';
-  const laneName: string = core.getInput('lane-name');
-  const branchName: string = core.getInput('branch-name') || laneName;
+  const laneId: string = core.getInput('lane-id') || process.env.LANE_ID || '';
+  const branchName: string = core.getInput('branch-name') || laneId;
   const skipPush: boolean =
     core.getInput('skip-push') === 'true' ? true : false;
   const skipCI: boolean = core.getInput('skip-ci') === 'false' ? false : true;
@@ -22,11 +22,11 @@ try {
     throw new Error('Invalid project directory path');
   }
 
-  if (!laneName) {
-    throw new Error('Lane name is not found');
+  if (!laneId) {
+    throw new Error('Lane ID is not found');
   }
 
-  if (laneName === 'main') {
+  if (laneId === 'main') {
     throw new Error('Specify a lane other than "main"!');
   }
 
@@ -50,7 +50,7 @@ try {
     packageManager,
     skipPush,
     skipCI,
-    laneName,
+    laneId,
     branchName,
     gitUserName,
     gitUserEmail,
