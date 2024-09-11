@@ -28,6 +28,7 @@ runs:
   using: 'composite'
   steps:
     - name: 'run install components from lane'
-      run: 'dist/index.js'
+      run: node ${{ github.action_path }}/dist/index.js
+      shell: bash
       env:
         RUNNER_TEMP: ${{ runner.temp }}
