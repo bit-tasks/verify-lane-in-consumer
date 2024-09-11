@@ -4074,6 +4074,7 @@ const run = (runnerTemp, packageManager, skipPush, skipCI, laneId, branchName, g
         },
     };
     yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], laneShowOptions);
+    console.log('List of components in lane:', compsInLaneObj);
     // remove temporary workspace
     // await exec('rm', ['-rf', WS_DIR]);
     // add lane components as overrides in the project's package.json
@@ -4125,6 +4126,7 @@ const addLaneCompsToOverrides = (laneDetails, projectDir) => {
     const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
     const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
     const depsFromLane = (0, get_deps_from_lane_1.getDepsFromLane)(laneDetails);
+    console.log('List of dependencies from lane:', depsFromLane);
     const packageJsonOverrides = packageJson.overrides || {};
     packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), depsFromLane);
     fs_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
