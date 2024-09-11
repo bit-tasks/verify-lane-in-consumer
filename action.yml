@@ -29,7 +29,9 @@ runs:
   steps:
     - name: 'initialize a temporary bit workspace'
       shell: bash
-      run: mkdir -p "${RUNNER_TEMP}/bit-ws"
+      run: node ${{ github.action_path }}/dist/init-ws.js
+       env:
+        RUNNER_TEMP: ${{ runner.temp }}
     - name: 'run install components from lane'
       run: node ${{ github.action_path }}/dist/index.js
       shell: bash
