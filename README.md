@@ -23,6 +23,10 @@ The package manager to install the components. Default is `npm`.
 
 The command to run the tests. Default is `npm test`.
 
+## `skip-push`
+
+Run the tests without committing back the changes to a new branch.
+
 ## Example usage
 
 ```yml
