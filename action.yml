@@ -16,7 +16,7 @@ inputs:
     description: 'The ID of the Bit lane to sync from in the format: org.scope/lane'
     required: true
   test-command:
-    description: The command to run the tests
+    description: 'The command to run the tests'
     required: false
     default: 'npm test'
   skip-push:
