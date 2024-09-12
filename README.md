@@ -25,7 +25,7 @@ The command to run the tests. Default is `npm test`.
 
 ### `skip-push`
 
-Run the tests without committing back the changes to a new branch.
+Run the tests without committing back the changes to a new branch (for fully automated testing that doesn't require further actions). Default is `false`.
 
 ## Example usage
 

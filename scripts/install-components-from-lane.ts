@@ -2,15 +2,27 @@ import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
 import { WS_NAME } from '../index';
-// import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
+import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 import { getDepsFromLane } from '../utils/get-deps-from-lane';
 import type { LaneDetails } from '../types/lane-details';
-import type { PackageManager } from '../types/package-manager';
+import type {
+  PackageManager,
+  PackageManagerInstallCommands,
+} from '../types/package-manager';
 
-const installCommand: Record<PackageManager, string> = {
-  npm: 'npm install',
-  yarn: 'yarn add',
-  pnpm: 'pnpm install',
+const installCommand: PackageManagerInstallCommands = {
+  npm: {
+    install: 'npm install',
+    uninstall: 'npm uninstall',
+  },
+  yarn: {
+    install: 'yarn install',
+    uninstall: 'yarn remove',
+  },
+  pnpm: {
+    install: 'pnpm install',
+    uninstall: 'pnpm remove',
+  },
 };
 
 const run = async (
@@ -45,6 +57,8 @@ const run = async (
     },
   };
 
+  core.info(`Fetching information about: ${laneId}`);
+
   // get the lane details
   await exec(
     'bit',
@@ -55,17 +69,30 @@ const run = async (
   // extract component IDs  from the lane and transform to dependencies and overrides
   const [overrides, depsToInstall] = getDepsFromLane(compsInLaneObj);
 
-  // install dependencies from the lane
-  await exec(`${installCommand[packageManager]} ${depsToInstall}`, [], {
+  core.info(
+    `Uninstalling lane dependencies before adding them to overrides: ${depsToInstall}`
+  );
+
+  await exec(
+    `${installCommand[packageManager].uninstall} ${depsToInstall}`,
+    [],
+    {
+      cwd: projectDir,
+    }
+  );
+
+  core.info(`Add dependencies to package.json overrides`);
+  addLaneCompsToOverrides(packageJsonPath, overrides);
+
+  core.info(`Installing dependencies`);
+
+  await exec(`${installCommand[packageManager].install}`, [], {
     cwd: projectDir,
   });
 
-  // add lane components to the package.json overrides and install again (direct deps have to be replaced with the lane versions first)
-  // addLaneCompsToOverrides(packageJsonPath, overrides);
-
-  // await exec(`${installCommand[packageManager]}`, [], {
-  //   cwd: projectDir,
-  // });
+  core.info(
+    `Running the test command to verify changes in lane: ${testCommand}`
+  );
 
   // run the test command
   await exec(testCommand, [], {
