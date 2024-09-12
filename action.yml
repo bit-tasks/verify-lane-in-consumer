@@ -1,7 +1,7 @@
-name: 'Lane in Consumer Validation'
+name: 'Verify Lane In Consumer'
 description: 'Create a new Bit lane for each new Git branch'
 branding:
-  icon: 'git-merge'
+  icon: 'award'
   color: 'purple'
 inputs:
   package-manager:
