@@ -2,7 +2,7 @@ import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
 import { WS_NAME } from '../index';
-import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
+// import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 import { getDepsFromLane } from '../utils/get-deps-from-lane';
 import type { LaneDetails } from '../types/lane-details';
 import type {
@@ -69,20 +69,13 @@ const run = async (
   // extract component IDs  from the lane and transform to dependencies and overrides
   const [overrides, depsToInstall] = getDepsFromLane(compsInLaneObj);
 
-  core.info(
-    `Uninstalling lane dependencies before adding them to overrides: ${depsToInstall}`
-  );
+  core.info(`Installing dependencies from lane: ${depsToInstall}`);
 
-  await exec(
-    `${installCommand[packageManager].uninstall} ${depsToInstall}`,
-    [],
-    {
-      cwd: projectDir,
-    }
-  );
+  await exec(`${installCommand[packageManager].install} ${depsToInstall}`, [], {
+    cwd: projectDir,
+  });
 
-  core.info(`Add dependencies to package.json overrides`);
-  addLaneCompsToOverrides(packageJsonPath, overrides);
+  // addLaneCompsToOverrides(packageJsonPath, overrides);
 
   core.info(`Installing dependencies`);
 

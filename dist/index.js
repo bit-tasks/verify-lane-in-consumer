@@ -4051,7 +4051,7 @@ const exec_1 = __nccwpck_require__(514);
 const core = __importStar(__nccwpck_require__(186));
 const path_1 = __nccwpck_require__(17);
 const index_1 = __nccwpck_require__(177);
-const add_lane_comps_to_overrides_1 = __nccwpck_require__(651);
+// import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 const get_deps_from_lane_1 = __nccwpck_require__(493);
 const installCommand = {
     npm: {
@@ -4089,12 +4089,11 @@ const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchNa
     yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], laneShowOptions);
     // extract component IDs  from the lane and transform to dependencies and overrides
     const [overrides, depsToInstall] = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
-    core.info(`Uninstalling lane dependencies before adding them to overrides: ${depsToInstall}`);
-    yield (0, exec_1.exec)(`${installCommand[packageManager].uninstall} ${depsToInstall}`, [], {
+    core.info(`Installing dependencies from lane: ${depsToInstall}`);
+    yield (0, exec_1.exec)(`${installCommand[packageManager].install} ${depsToInstall}`, [], {
         cwd: projectDir,
     });
-    core.info(`Add dependencies to package.json overrides`);
-    (0, add_lane_comps_to_overrides_1.addLaneCompsToOverrides)(packageJsonPath, overrides);
+    // addLaneCompsToOverrides(packageJsonPath, overrides);
     core.info(`Installing dependencies`);
     yield (0, exec_1.exec)(`${installCommand[packageManager].install}`, [], {
         cwd: projectDir,
@@ -4129,28 +4128,6 @@ const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchNa
     }
 });
 exports["default"] = run;
-
-
-/***/ }),
-
-/***/ 651:
-/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
-
-"use strict";
-
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.addLaneCompsToOverrides = void 0;
-const fs_1 = __importDefault(__nccwpck_require__(147));
-const addLaneCompsToOverrides = (packageJsonPath, overrides = {}) => {
-    const packageJson = JSON.parse(fs_1.default.readFileSync(packageJsonPath, 'utf-8'));
-    const packageJsonOverrides = packageJson.overrides || {};
-    packageJson.overrides = Object.assign(Object.assign({}, packageJsonOverrides), overrides);
-    fs_1.default.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-};
-exports.addLaneCompsToOverrides = addLaneCompsToOverrides;
 
 
 /***/ }),
