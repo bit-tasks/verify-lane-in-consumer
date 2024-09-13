@@ -4,7 +4,6 @@ import { join } from 'path';
 import { WS_NAME } from '../index';
 import { getDepsFromLane } from '../utils/get-deps-from-lane';
 import { updateDependencyVersions } from '../utils/update-dependency-versions';
-import { laneShowOptions } from '../utils/lane-show-options';
 import {
   packageManagerCommands,
   type PackageManager,
@@ -31,16 +30,21 @@ const run = async (
 
   core.info(`Fetching information about: ${laneId}`);
 
-  const componentsInLane = {} as LaneDetails;
+  let compsInLaneJson = '';
+  let compsInLaneObj = {} as LaneDetails;
 
-  await exec(
-    'bit',
-    ['lane', 'show', `"${laneId}"`, '--remote', '--json'],
-    laneShowOptions(wsDir, componentsInLane)
-  );
+  await exec('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], {
+    cwd: wsDir,
+    listeners: {
+      stdout: (data: Buffer) => {
+        compsInLaneJson = data.toString();
+        compsInLaneObj = JSON.parse(compsInLaneJson);
+      },
+    },
+  });
 
   // Extract component IDs from the lane and transform them into dependencies
-  const dependenciesInLane = getDepsFromLane(componentsInLane);
+  const dependenciesInLane = getDepsFromLane(compsInLaneObj);
 
   // Update the package.json with the new dependencies
   updateDependencyVersions(dependenciesInLane, packageJsonPath);

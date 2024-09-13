@@ -4053,7 +4053,6 @@ const path_1 = __nccwpck_require__(1017);
 const index_1 = __nccwpck_require__(4177);
 const get_deps_from_lane_1 = __nccwpck_require__(9493);
 const update_dependency_versions_1 = __nccwpck_require__(3326);
-const lane_show_options_1 = __nccwpck_require__(5128);
 const package_manager_commands_1 = __nccwpck_require__(5295);
 const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
     const wsDir = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
@@ -4061,10 +4060,19 @@ const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchNa
     // Create a temporary workspace
     yield (0, exec_1.exec)('bit', ['init', index_1.WS_NAME, ...args], { cwd: runnerTemp });
     core.info(`Fetching information about: ${laneId}`);
-    const componentsInLane = {};
-    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], (0, lane_show_options_1.laneShowOptions)(wsDir, componentsInLane));
+    let compsInLaneJson = '';
+    let compsInLaneObj = {};
+    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], {
+        cwd: wsDir,
+        listeners: {
+            stdout: (data) => {
+                compsInLaneJson = data.toString();
+                compsInLaneObj = JSON.parse(compsInLaneJson);
+            },
+        },
+    });
     // Extract component IDs from the lane and transform them into dependencies
-    const dependenciesInLane = (0, get_deps_from_lane_1.getDepsFromLane)(componentsInLane);
+    const dependenciesInLane = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
     // Update the package.json with the new dependencies
     (0, update_dependency_versions_1.updateDependencyVersions)(dependenciesInLane, packageJsonPath);
     core.info(`Installing dependencies`);
@@ -4130,28 +4138,6 @@ const getDepsFromLane = (laneDetails) => {
     return dependencies;
 };
 exports.getDepsFromLane = getDepsFromLane;
-
-
-/***/ }),
-
-/***/ 5128:
-/***/ ((__unused_webpack_module, exports) => {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.laneShowOptions = void 0;
-let compsInLaneJson = '';
-const laneShowOptions = (wsDir, compsInLaneObj) => ({
-    cwd: wsDir,
-    listeners: {
-        stdout: (data) => {
-            compsInLaneJson = data.toString();
-            compsInLaneObj = JSON.parse(compsInLaneJson);
-        },
-    },
-});
-exports.laneShowOptions = laneShowOptions;
 
 
 /***/ }),
