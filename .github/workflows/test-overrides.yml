@@ -29,4 +29,4 @@ jobs:
           lane-id: ${{ github.event.inputs.lane-id }}
           project-dir: 'test-data'
           skip-push: 'true'
-          npm-overrides: 'true'
+          use-overrides: 'true'
