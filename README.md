@@ -19,6 +19,15 @@ The relative path to the project directory. Default is `.`.
 
 The package manager to install the components. Default is `npm`.
 
+### `use-overrides`
+
+Add the dependencies from the lane to the `"overrides"` section in the `package.json` file. Default is `fasle`.
+
+This option is useful when testing indirect dependencies.
+
+For example, if a lane includes the `button` component, but the consumer project only uses one of the button dependents, the `button-group` component, then installing the lanes' version of the `button` component will not affect the project (since it's not used directly).
+To solve that isSecureContext, either include the relevant dependents in the lane (in this case, the `button-group` component) or use the `use-overrides` option to force the use of the lane's version of the `button` component.
+
 ### `test-command`
 
 The command to run the tests. Default is `npm test`.
