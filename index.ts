@@ -16,6 +16,9 @@ try {
   const skipPush: boolean =
     core.getInput('skip-push') === 'true' ? true : false;
 
+  const useOverrides: boolean =
+    core.getInput('use-overrides') === 'true' ? true : false;
+
   if (!isValidPOSIXPath(projectDir)) {
     throw new Error('Invalid project directory path');
   }
@@ -44,6 +47,7 @@ try {
   }
 
   run(
+    useOverrides,
     testCommand,
     runnerTemp,
     packageManager,

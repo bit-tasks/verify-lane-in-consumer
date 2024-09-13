@@ -11,6 +11,7 @@ import {
 import { LaneDetails } from '../types/lane-details';
 
 const run = async (
+  useOverrides: boolean,
   testCommand: string,
   runnerTemp: string,
   packageManager: PackageManager,
@@ -47,7 +48,7 @@ const run = async (
   const dependenciesInLane = getDepsFromLane(compsInLaneObj);
 
   // Update the package.json with the new dependencies
-  updateDependencyVersions(dependenciesInLane, packageJsonPath);
+  updateDependencyVersions(dependenciesInLane, packageJsonPath, useOverrides);
 
   core.info(`Installing dependencies`);
 

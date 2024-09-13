@@ -3979,6 +3979,7 @@ try {
     const laneId = core.getInput('lane-id') || '';
     const branchName = core.getInput('branch-name') || laneId;
     const skipPush = core.getInput('skip-push') === 'true' ? true : false;
+    const useOverrides = core.getInput('use-overrides') === 'true' ? true : false;
     if (!(0, validate_posix_path_1.isValidPOSIXPath)(projectDir)) {
         throw new Error('Invalid project directory path');
     }
@@ -4000,7 +4001,7 @@ try {
     if (!runnerTemp) {
         throw new Error('Runner temp directory not found');
     }
-    (0, install_components_from_lane_1.default)(testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(useOverrides, testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);
@@ -4054,7 +4055,7 @@ const index_1 = __nccwpck_require__(4177);
 const get_deps_from_lane_1 = __nccwpck_require__(9493);
 const update_dependency_versions_1 = __nccwpck_require__(3326);
 const package_manager_commands_1 = __nccwpck_require__(5295);
-const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
+const run = (useOverrides, testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
     const wsDir = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
     const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
     // Create a temporary workspace
@@ -4074,7 +4075,7 @@ const run = (testCommand, runnerTemp, packageManager, skipPush, laneId, branchNa
     // Extract component IDs from the lane and transform them into dependencies
     const dependenciesInLane = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
     // Update the package.json with the new dependencies
-    (0, update_dependency_versions_1.updateDependencyVersions)(dependenciesInLane, packageJsonPath);
+    (0, update_dependency_versions_1.updateDependencyVersions)(dependenciesInLane, packageJsonPath, useOverrides);
     core.info(`Installing dependencies`);
     yield (0, exec_1.exec)(`${package_manager_commands_1.packageManagerCommands[packageManager].install}`, [], {
         cwd: projectDir,

@@ -22,6 +22,8 @@ inputs:
   skip-push:
     description: 'Skip commit push (for testing)'
     required: false
+  use-overrides:
+    description: 'Add dependencies from lane to the package.json "overrides" property'
 runs:
   using: 'node20'
   main: 'dist/index.js'
