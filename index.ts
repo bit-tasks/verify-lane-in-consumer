@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import run from './scripts/install-components-from-lane';
 import { isValidPOSIXPath } from './utils/validate-posix-path';
-import type { PackageManager } from './types/package-manager';
+import type { PackageManager } from './utils/package-manager-commands';
 
 export const WS_NAME = 'bit-ws';
 

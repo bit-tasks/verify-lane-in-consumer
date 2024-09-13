@@ -2,28 +2,14 @@ import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
 import { WS_NAME } from '../index';
-// import { addLaneCompsToOverrides } from '../utils/add-lane-comps-to-overrides';
 import { getDepsFromLane } from '../utils/get-deps-from-lane';
-import type { LaneDetails } from '../types/lane-details';
-import type {
-  PackageManager,
-  PackageManagerInstallCommands,
-} from '../types/package-manager';
-
-const installCommand: PackageManagerInstallCommands = {
-  npm: {
-    install: 'npm install',
-    uninstall: 'npm uninstall',
-  },
-  yarn: {
-    install: 'yarn install',
-    uninstall: 'yarn remove',
-  },
-  pnpm: {
-    install: 'pnpm install',
-    uninstall: 'pnpm remove',
-  },
-};
+import { updateDependencyVersions } from '../utils/update-dependency-versions';
+import { laneShowOptions } from '../utils/lane-show-options';
+import {
+  packageManagerCommands,
+  type PackageManager,
+} from '../utils/package-manager-commands';
+import { LaneDetails } from '../types/lane-details';
 
 const run = async (
   testCommand: string,
@@ -40,46 +26,28 @@ const run = async (
   const wsDir = join(runnerTemp, WS_NAME);
   const packageJsonPath = join(projectDir, 'package.json');
 
-  // create a temporary workspace
+  // Create a temporary workspace
   await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
-
-  // retrieve the list of components in a lane
-  let compsInLaneJson = '';
-  let compsInLaneObj = {} as LaneDetails;
-
-  const laneShowOptions = {
-    cwd: wsDir,
-    listeners: {
-      stdout: (data: Buffer) => {
-        compsInLaneJson = data.toString();
-        compsInLaneObj = JSON.parse(compsInLaneJson);
-      },
-    },
-  };
 
   core.info(`Fetching information about: ${laneId}`);
 
-  // get the lane details
+  const componentsInLane = {} as LaneDetails;
+
   await exec(
     'bit',
     ['lane', 'show', `"${laneId}"`, '--remote', '--json'],
-    laneShowOptions
+    laneShowOptions(wsDir, componentsInLane)
   );
 
-  // extract component IDs  from the lane and transform to dependencies and overrides
-  const [overrides, depsToInstall] = getDepsFromLane(compsInLaneObj);
+  // Extract component IDs from the lane and transform them into dependencies
+  const dependenciesInLane = getDepsFromLane(componentsInLane);
 
-  core.info(`Installing dependencies from lane: ${depsToInstall}`);
-
-  await exec(`${installCommand[packageManager].install} ${depsToInstall}`, [], {
-    cwd: projectDir,
-  });
-
-  // addLaneCompsToOverrides(packageJsonPath, overrides);
+  // Update the package.json with the new dependencies
+  updateDependencyVersions(dependenciesInLane, packageJsonPath);
 
   core.info(`Installing dependencies`);
 
-  await exec(`${installCommand[packageManager].install}`, [], {
+  await exec(`${packageManagerCommands[packageManager].install}`, [], {
     cwd: projectDir,
   });
 
@@ -87,7 +55,7 @@ const run = async (
     `Running the test command to verify changes in lane: ${testCommand}`
   );
 
-  // run the test command
+  // Run the test command
   await exec(testCommand, [], {
     cwd: projectDir,
   });
