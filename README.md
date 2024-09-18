@@ -1,9 +1,10 @@
 # Verify a Bit Lane in a Consumer Project
 
-This task verifies the changes on a Bit lane are compatible with the consumer project.
+This task verifies the changes on a Bit lane are compatible with the consumer project, maintained in a git repository.
+Using this task lanes can be tested in projects that only consume Bit components but do not maintain them.
 
 A Bit lane containes a set of components that are updated together.
-This task installs the pre-release version of the components in the lane and runs the tests (or deploys to stage) in the consumer project to verify the changes.
+This task installs the pre-release version of the components in the lane and runs the tests in the consumer project to verify the changes.
 
 The auto-generated branch is only for testing purposes and should not be merged to the main branch.
 
@@ -30,7 +31,8 @@ To solve that isSecureContext, either include the relevant dependents in the lan
 
 ### `test-command`
 
-The command to run the tests. Default is `npm test`.
+The command to run the tests after the dependencies from the lane were installed. Default is `npm test`.
+This is especially usefull when you use the `skip-push` input to run the installation without committing the changes back (in this case your CI will not be triggered and you would need to explicitly define a testing script).
 
 ### `skip-push`
 
