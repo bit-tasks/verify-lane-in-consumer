@@ -19,10 +19,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Initialize Bit
-        uses: bit-tasks/init@v2
-        with:
-          skip-install: 'true'
       - name: Verify Lane In Consumer
         uses: bit-tasks/verify-lane-in-consumer@main
         with:
