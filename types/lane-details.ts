@@ -1,14 +1,18 @@
-interface Component {
+type Component = {
   id: string;
-  head: string;
-}
+};
 
-interface ID {
-  name: string;
-  scope: string;
-}
+type LaneData = {
+  id: string;
+  listComponents: Component[];
+};
 
-export interface LaneDetails {
-  id: ID;
-  components: Component[];
-}
+export type LanesResponse = {
+  data: {
+    lanes: LaneData;
+  };
+  error?: {
+    message: string;
+    code?: number;
+  };
+};

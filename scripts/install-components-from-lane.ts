@@ -1,19 +1,17 @@
 import { exec } from '@actions/exec';
 import * as core from '@actions/core';
 import { join } from 'path';
-import { WS_NAME } from '../index';
-import { getDepsFromLane } from '../utils/get-deps-from-lane';
+import { fetchLaneComponents } from '../utils/fetch-lane-components';
+import { laneComponentsToDeps } from '../utils/lane-components-to-deps';
 import { updateDependencyVersions } from '../utils/update-dependency-versions';
 import {
   packageManagerCommands,
   type PackageManager,
 } from '../utils/package-manager-commands';
-import { LaneDetails } from '../types/lane-details';
 
 const run = async (
   useOverrides: boolean,
   testCommand: string,
-  runnerTemp: string,
   packageManager: PackageManager,
   skipPush: boolean,
   laneId: string,
@@ -23,32 +21,22 @@ const run = async (
   projectDir: string,
   args: string[]
 ) => {
-  const wsDir = join(runnerTemp, WS_NAME);
   const packageJsonPath = join(projectDir, 'package.json');
 
-  // Create a temporary workspace
-  await exec('bit', ['init', WS_NAME, ...args], { cwd: runnerTemp });
+  core.info(`Fetching list of components in lane: ${laneId}`);
+  const laneData = await fetchLaneComponents(laneId);
 
-  core.info(`Fetching information about: ${laneId}`);
-
-  let compsInLaneJson = '';
-  let compsInLaneObj = {} as LaneDetails;
-
-  await exec('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], {
-    cwd: wsDir,
-    listeners: {
-      stdout: (data: Buffer) => {
-        compsInLaneJson = data.toString();
-        compsInLaneObj = JSON.parse(compsInLaneJson);
-      },
-    },
-  });
-
-  // Extract component IDs from the lane and transform them into dependencies
-  const dependenciesInLane = getDepsFromLane(compsInLaneObj);
-
-  // Update the package.json with the new dependencies
-  updateDependencyVersions(dependenciesInLane, packageJsonPath, useOverrides);
+  if (laneData?.data.lanes.listComponents.length) {
+    const dependenciesInLane = laneComponentsToDeps(laneData);
+    core.info(
+      `Updating package.json with the following dependencies:\n ${JSON.stringify(
+        dependenciesInLane
+      )}`
+    );
+    updateDependencyVersions(dependenciesInLane, packageJsonPath, useOverrides);
+  } else {
+    core.error(`No components found in lane: ${laneId}`);
+  }
 
   core.info(`Installing dependencies`);
 

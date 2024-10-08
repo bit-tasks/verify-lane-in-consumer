@@ -3966,11 +3966,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.WS_NAME = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const install_components_from_lane_1 = __importDefault(__nccwpck_require__(1154));
 const validate_posix_path_1 = __nccwpck_require__(533);
-exports.WS_NAME = 'bit-ws';
 try {
     const testCommand = core.getInput('test-command') || 'npm test';
     const projectDir = core.getInput('project-dir') || './';
@@ -3997,11 +3995,7 @@ try {
     if (!gitUserEmail) {
         throw new Error('Git user email token not found');
     }
-    const runnerTemp = process.env.RUNNER_TEMP;
-    if (!runnerTemp) {
-        throw new Error('Runner temp directory not found');
-    }
-    (0, install_components_from_lane_1.default)(useOverrides, testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
+    (0, install_components_from_lane_1.default)(useOverrides, testCommand, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args);
 }
 catch (error) {
     core.setFailed(error.message);
@@ -4051,31 +4045,22 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const exec_1 = __nccwpck_require__(1514);
 const core = __importStar(__nccwpck_require__(2186));
 const path_1 = __nccwpck_require__(1017);
-const index_1 = __nccwpck_require__(4177);
-const get_deps_from_lane_1 = __nccwpck_require__(9493);
+const fetch_lane_components_1 = __nccwpck_require__(8563);
+const lane_components_to_deps_1 = __nccwpck_require__(7372);
 const update_dependency_versions_1 = __nccwpck_require__(3326);
 const package_manager_commands_1 = __nccwpck_require__(5295);
-const run = (useOverrides, testCommand, runnerTemp, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
-    const wsDir = (0, path_1.join)(runnerTemp, index_1.WS_NAME);
+const run = (useOverrides, testCommand, packageManager, skipPush, laneId, branchName, gitUserName, gitUserEmail, projectDir, args) => __awaiter(void 0, void 0, void 0, function* () {
     const packageJsonPath = (0, path_1.join)(projectDir, 'package.json');
-    // Create a temporary workspace
-    yield (0, exec_1.exec)('bit', ['init', index_1.WS_NAME, ...args], { cwd: runnerTemp });
-    core.info(`Fetching information about: ${laneId}`);
-    let compsInLaneJson = '';
-    let compsInLaneObj = {};
-    yield (0, exec_1.exec)('bit', ['lane', 'show', `"${laneId}"`, '--remote', '--json'], {
-        cwd: wsDir,
-        listeners: {
-            stdout: (data) => {
-                compsInLaneJson = data.toString();
-                compsInLaneObj = JSON.parse(compsInLaneJson);
-            },
-        },
-    });
-    // Extract component IDs from the lane and transform them into dependencies
-    const dependenciesInLane = (0, get_deps_from_lane_1.getDepsFromLane)(compsInLaneObj);
-    // Update the package.json with the new dependencies
-    (0, update_dependency_versions_1.updateDependencyVersions)(dependenciesInLane, packageJsonPath, useOverrides);
+    core.info(`Fetching list of components in lane: ${laneId}`);
+    const laneData = yield (0, fetch_lane_components_1.fetchLaneComponents)(laneId);
+    if (laneData === null || laneData === void 0 ? void 0 : laneData.data.lanes.listComponents.length) {
+        const dependenciesInLane = (0, lane_components_to_deps_1.laneComponentsToDeps)(laneData);
+        core.info(`Updating package.json with the following dependencies:\n ${JSON.stringify(dependenciesInLane)}`);
+        (0, update_dependency_versions_1.updateDependencyVersions)(dependenciesInLane, packageJsonPath, useOverrides);
+    }
+    else {
+        core.error(`No components found in lane: ${laneId}`);
+    }
     core.info(`Installing dependencies`);
     yield (0, exec_1.exec)(`${package_manager_commands_1.packageManagerCommands[packageManager].install}`, [], {
         cwd: projectDir,
@@ -4114,31 +4099,86 @@ exports["default"] = run;
 
 /***/ }),
 
-/***/ 9493:
+/***/ 8563:
+/***/ (function(__unused_webpack_module, exports) {
+
+"use strict";
+
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.fetchLaneComponents = void 0;
+function fetchLaneComponents(laneId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const query = `
+  query LIST_LANE_COMPONENTS($id: String!, $namespace: String) {
+    lanes {
+      id
+      listComponents(id: $id, namespace: $namespace) {
+        id
+        }
+      }
+    }
+`;
+        const variables = {
+            id: laneId,
+        };
+        const token = process.env.BIT_CONFIG_ACCESS_TOKEN;
+        if (!token) {
+            throw new Error('BIT_CONFIG_ACCESS_TOKEN not found');
+        }
+        try {
+            const response = yield fetch('https://api.v2.bit.cloud/graphql', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    query,
+                    variables,
+                }),
+            });
+            const data = yield response.json();
+            return data;
+        }
+        catch (error) {
+            console.error('Error:', error);
+        }
+    });
+}
+exports.fetchLaneComponents = fetchLaneComponents;
+
+
+/***/ }),
+
+/***/ 7372:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDepsFromLane = void 0;
-const getDepsFromLane = (laneDetails) => {
-    // const overrides: Record<string, string> = {};
-    // const listOfDepsToInstall: string[] = [];
+exports.laneComponentsToDeps = void 0;
+const laneComponentsToDeps = (laneData) => {
     const dependencies = {};
-    laneDetails.components.forEach((component) => {
+    laneData.data.lanes.listComponents.forEach((component) => {
         const [componentIdNoVersion, componentVersion] = component.id.split('@');
         const componentIdParts = componentIdNoVersion.split('/');
         const scope = componentIdParts.shift().replace(/\./g, '/');
         const packageScope = '@'.concat(scope.replace(/\./g, '/'));
         const packageNameNoScope = componentIdParts.join('.');
-        // listOfDepsToInstall.push(
-        //   `${packageScope}.${packageNameNoScope}@${componentVersion}`
-        // );
         dependencies[`${packageScope}.${packageNameNoScope}`] = `${componentVersion}`;
     });
     return dependencies;
 };
-exports.getDepsFromLane = getDepsFromLane;
+exports.laneComponentsToDeps = laneComponentsToDeps;
 
 
 /***/ }),
@@ -4231,8 +4271,6 @@ const updateDependencyVersions = (newDependencyVersions, packageJsonPath, addNew
         }
         // Write the updated package.json back to the file system
         fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-        console.log('Dependencies updated successfully.');
-        console.log(fs.readFileSync(packageJsonPath, 'utf8'));
     }
     catch (error) {
         console.error(`Error updating dependencies: ${error}`);

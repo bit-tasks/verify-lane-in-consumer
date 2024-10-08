@@ -43,8 +43,6 @@ export const updateDependencyVersions = (
 
     // Write the updated package.json back to the file system
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-    console.log('Dependencies updated successfully.');
-    console.log(fs.readFileSync(packageJsonPath, 'utf8'));
   } catch (error) {
     console.error(`Error updating dependencies: ${error}`);
   }

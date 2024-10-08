@@ -3,8 +3,6 @@ import run from './scripts/install-components-from-lane';
 import { isValidPOSIXPath } from './utils/validate-posix-path';
 import type { PackageManager } from './utils/package-manager-commands';
 
-export const WS_NAME = 'bit-ws';
-
 try {
   const testCommand: string = core.getInput('test-command') || 'npm test';
   const projectDir: string = core.getInput('project-dir') || './';
@@ -41,15 +39,9 @@ try {
     throw new Error('Git user email token not found');
   }
 
-  const runnerTemp = process.env.RUNNER_TEMP;
-  if (!runnerTemp) {
-    throw new Error('Runner temp directory not found');
-  }
-
   run(
     useOverrides,
     testCommand,
-    runnerTemp,
     packageManager,
     skipPush,
     laneId,
